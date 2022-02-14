@@ -75,18 +75,25 @@ type Config struct {
 	Wallets        map[string]string `json:"wallets"`
 }
 
-func getConfig() (Config, error) {
-	var config Config
-
-	var err error
-	config.configFilePath, err = xdg.SearchConfigFile(configFilePath)
+func getConfigFilePath() (string, error) {
+	configFilePath, err := xdg.SearchConfigFile(configFilePath)
 	if err != nil {
 		var err2 error
-		config.configFilePath, err2 = xdg.ConfigFile(configFilePath)
+		configFilePath, err2 = xdg.ConfigFile(configFilePath)
 		if err2 != nil {
 			// something is horribly wrong (directories can't be created, probably)
 			logFatal(err2)
 		}
+	}
+	return configFilePath, err
+}
+
+func getConfig() (Config, error) {
+	var config Config
+
+	var err error
+	config.configFilePath, err = getConfigFilePath()
+	if err != nil {
 		return config, err
 	}
 
@@ -351,14 +358,8 @@ func Help() {
 }
 
 func main() {
-	config, err := getConfig()
-	if config.WalletsDir == "" {
-		config.WalletsDir = getWalletsDir()
-	}
-	err2 := os.Chdir(config.WalletsDir)
-	if err2 != nil {
-		logFatal(err2)
-	}
+	var config Config
+	var err error
 
 	wrapSubcommand := func(err error) {
 		if err != nil {
@@ -370,12 +371,24 @@ func main() {
 		}
 	}
 
-	if err != nil {
-		logError(err)
-		logInfo("failed to read config file, performing initialization")
-		wrapSubcommand(Init(&config))
-		os.Exit(0)
+
+	loadConfig := func() {
+		config, err = getConfig()
+		if config.WalletsDir == "" {
+			config.WalletsDir = getWalletsDir()
+		}
+		err2 := os.Chdir(config.WalletsDir)
+		if err2 != nil {
+			logFatal(err2)
+		}
+		if err != nil {
+			logError(err)
+			logInfo("failed to read config file, performing initialization")
+			wrapSubcommand(Init(&config))
+			os.Exit(0)
+		}
 	}
+
 
 	if len(os.Args) > 1 {
 		subcommand := os.Args[1]
@@ -383,12 +396,16 @@ func main() {
 			argument := strings.Join(os.Args[2:], " ")
 			switch subcommand {
 			case "switch":
+				loadConfig()
 				wrapSubcommand(Switch(&config, argument))
 			case "edit":
+				loadConfig()
 				wrapSubcommand(Edit(&config, argument))
 			case "add":
+				loadConfig()
 				wrapSubcommand(Add(&config, argument))
 			case "forget":
+				loadConfig()
 				wrapSubcommand(Forget(&config, argument))
 			default:
 				logError("unknown subcommand")
@@ -398,12 +415,23 @@ func main() {
 		} else {
 			switch subcommand {
 			case "init":
+				config.configFilePath, err = getConfigFilePath()
+				if err != nil {
+					logFatal(err)
+				}
+				config.WalletsDir = getWalletsDir()
 				wrapSubcommand(Init(&config))
 			case "status":
+				loadConfig()
 				Status(&config)
 			case "config":
+				config.configFilePath, err = getConfigFilePath()
+				if err != nil {
+					logFatal(err)
+				}
 				Config_(&config)
 			case "directory":
+				config.WalletsDir = getWalletsDir()
 				Directory(&config)
 			case "help":
 				Help()
