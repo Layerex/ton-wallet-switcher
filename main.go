@@ -33,6 +33,12 @@ func logFatal(v ...interface{}) {
 	os.Exit(1)
 }
 
+func logHelp(v ...interface{}) {
+	logError(v...)
+	Help()
+	os.Exit(1)
+}
+
 // Input
 
 var scanner = bufio.NewScanner(os.Stdin)
@@ -408,9 +414,7 @@ func main() {
 				loadConfig()
 				wrapSubcommand(Forget(&config, argument))
 			default:
-				logError("unknown subcommand")
-				Help()
-				os.Exit(1)
+				logHelp("unknown subcommand")
 			}
 		} else {
 			switch subcommand {
@@ -436,18 +440,12 @@ func main() {
 			case "help":
 				Help()
 			case "switch", "edit", "add", "forget":
-				logError("no argument")
-				Help()
-				os.Exit(1)
+				logHelp("no argument")
 			default:
-				logError("unknown subcommand")
-				Help()
-				os.Exit(1)
+				logHelp("unknown subcommand")
 			}
 		}
 	} else {
-		logError("no subcommand specified")
-		Help()
-		os.Exit(1)
+		logHelp("no subcommand specified")
 	}
 }
