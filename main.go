@@ -263,7 +263,8 @@ func Switch(config *Config, walletName string) error {
 }
 
 func Edit(config *Config, walletName string) error {
-	if config.Wallets[walletName] == "" {
+	_, ok := config.Wallets[walletName]
+	if !ok {
 		return fmt.Errorf("no wallet \"%s\" present", walletName)
 	}
 	var newWalletName string
@@ -325,7 +326,8 @@ func Add(config *Config, walletDirName string) error {
 }
 
 func Forget(config *Config, walletName string) error {
-	if config.Wallets[walletName] == "" {
+	_, ok := config.Wallets[walletName]
+	if !ok {
 		return fmt.Errorf("no wallet \"%s\" present", walletName)
 	}
 	if config.CurrentWallet == walletName {
