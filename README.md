@@ -23,6 +23,7 @@ Commands:
   edit [WALLET]   Edit wallet name and description
   add [WALLET]    Add an existing wallet directory or create a new one
   forget [WALLET] Forget about wallet
+  remove [WALLET] Forget about wallet and remove its directory
   config          Get this utility config path
   directory       Get TON Wallet directory path
   help            Print this help

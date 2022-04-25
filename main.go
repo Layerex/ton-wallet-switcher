@@ -67,6 +67,7 @@ Commands:
   edit [WALLET]   Edit wallet name and description
   add [WALLET]    Add an existing wallet directory or create a new one
   forget [WALLET] Forget about wallet
+  remove [WALLET] Forget about wallet and remove its directory
   config          Get this utility config path
   directory       Get %s directory path
   help            Print this help
@@ -347,6 +348,28 @@ func Forget(config *Config, walletName string) error {
 	return nil
 }
 
+func Remove(config *Config, walletName string) error {
+	_, ok := config.Wallets[walletName]
+	if !ok {
+		return fmt.Errorf("no wallet \"%s\" present", walletName)
+	}
+	fmt.Printf("Do you really want to remove the \"%s\" wallet? Type \"yes\" to confirm: ", walletName)
+	confirmation := scanLine()
+	if confirmation == "yes" {
+		err := Forget(config, walletName)
+		if err != nil {
+			return err
+		}
+		err = os.RemoveAll(walletName)
+		if err != nil && !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
+		return nil
+	} else {
+		return fmt.Errorf("operation aborted")
+	}
+}
+
 func Status(config *Config) {
 	fmt.Println(getCount(len(config.Wallets)) + ":")
 	for name, description := range config.Wallets {
@@ -419,6 +442,9 @@ func main() {
 			case "forget":
 				loadConfig()
 				wrapSubcommand(Forget(&config, argument))
+			case "remove":
+				loadConfig()
+				wrapSubcommand(Remove(&config, argument))
 			default:
 				logHelp("unknown subcommand")
 			}
@@ -445,7 +471,7 @@ func main() {
 				Directory(&config)
 			case "help":
 				Help()
-			case "switch", "edit", "add", "forget":
+			case "switch", "edit", "add", "forget", "remove":
 				logHelp("no argument")
 			default:
 				logHelp("unknown subcommand")
