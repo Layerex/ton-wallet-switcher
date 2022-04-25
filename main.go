@@ -117,7 +117,7 @@ func getConfig() (Config, error) {
 }
 
 func writeConfig(config *Config) error {
-	encodedConfig, err := json.Marshal(config)
+	encodedConfig, err := json.MarshalIndent(config, "", "\t")
 	if err != nil {
 		return err
 	}
