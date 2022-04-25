@@ -82,27 +82,19 @@ type Config struct {
 	Wallets        map[string]string `json:"wallets"`
 }
 
-func getConfigFilePath() (string, error) {
-	configFilePath, err := xdg.SearchConfigFile(configFilePath)
+func getConfigFilePath() (string) {
+	configFilePath, err := xdg.ConfigFile(configFilePath)
 	if err != nil {
-		var err2 error
-		configFilePath, err2 = xdg.ConfigFile(configFilePath)
-		if err2 != nil {
-			// something is horribly wrong (directories can't be created, probably)
-			logFatal(err2)
-		}
+		logFatal(err)
 	}
-	return configFilePath, err
+	return configFilePath
 }
 
 func getConfig() (Config, error) {
 	var config Config
 
 	var err error
-	config.configFilePath, err = getConfigFilePath()
-	if err != nil {
-		return config, err
-	}
+	config.configFilePath = getConfigFilePath()
 
 	rawConfig, err := ioutil.ReadFile(config.configFilePath)
 	if err != nil {
@@ -451,20 +443,14 @@ func main() {
 		} else {
 			switch subcommand {
 			case "init":
-				config.configFilePath, err = getConfigFilePath()
-				if err != nil {
-					logFatal(err)
-				}
+				config.configFilePath = getConfigFilePath()
 				config.WalletsDir = getWalletsDir()
 				wrapSubcommand(Init(&config))
 			case "status":
 				loadConfig()
 				Status(&config)
 			case "config":
-				config.configFilePath, err = getConfigFilePath()
-				if err != nil {
-					logFatal(err)
-				}
+				config.configFilePath = getConfigFilePath()
 				Config_(&config)
 			case "directory":
 				config.WalletsDir = getWalletsDir()
