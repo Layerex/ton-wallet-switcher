@@ -244,6 +244,10 @@ func Switch(config *Config, walletName string) error {
 	if config.CurrentWallet == walletName {
 		return fmt.Errorf("already switched to wallet \"%s\"", walletName)
 	}
+	_, ok := config.Wallets[walletName]
+	if !ok {
+		return fmt.Errorf("no wallet \"%s\" present", walletName)
+	}
 	if config.CurrentWallet != "" {
 		err := os.Rename(currentWalletDirName, config.CurrentWallet)
 		if err != nil {
