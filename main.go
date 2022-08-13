@@ -357,9 +357,8 @@ func Remove(config *Config, walletName string) error {
 			return err
 		}
 		return nil
-	} else {
-		return fmt.Errorf("operation aborted")
 	}
+	return fmt.Errorf("operation aborted")
 }
 
 func Status(config *Config) {
