@@ -82,7 +82,7 @@ type Config struct {
 	Wallets        map[string]string `json:"wallets"`
 }
 
-func getConfigFilePath() (string) {
+func getConfigFilePath() string {
 	configFilePath, err := xdg.ConfigFile(configFilePath)
 	if err != nil {
 		logFatal(err)
@@ -372,14 +372,6 @@ func Status(config *Config) {
 	}
 }
 
-func Config_(config *Config) {
-	fmt.Println(config.configFilePath)
-}
-
-func Directory(config *Config) {
-	fmt.Println(config.WalletsDir)
-}
-
 func Help() {
 	fmt.Printf(helpMessage, os.Args[0], walletsDirName)
 }
@@ -398,7 +390,6 @@ func main() {
 		}
 	}
 
-
 	loadConfig := func() {
 		config, err = getConfig()
 		if config.WalletsDir == "" {
@@ -415,7 +406,6 @@ func main() {
 			os.Exit(0)
 		}
 	}
-
 
 	if len(os.Args) > 1 {
 		subcommand := os.Args[1]
@@ -450,11 +440,9 @@ func main() {
 				loadConfig()
 				Status(&config)
 			case "config":
-				config.configFilePath = getConfigFilePath()
-				Config_(&config)
+				fmt.Println(getConfigFilePath())
 			case "directory":
-				config.WalletsDir = getWalletsDir()
-				Directory(&config)
+				fmt.Println(getWalletsDir())
 			case "help":
 				Help()
 			case "switch", "edit", "add", "forget", "remove":
