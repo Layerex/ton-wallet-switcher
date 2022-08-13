@@ -163,7 +163,7 @@ func getWallets(walletsDir string) ([]string, error) {
 	return wallets, nil
 }
 
-func addWallet(config *Config, walletDirName string, walletExists bool, changeCurrentWallet bool) error {
+func addWallet(config *Config, walletDirName string, changeCurrentWallet bool) error {
 	walletName := walletDirName
 
 	if walletName == currentWalletDirName {
@@ -217,7 +217,7 @@ func Init(config *Config) error {
 	config.Wallets = make(map[string]string)
 	config.CurrentWallet = ""
 	for _, walletDirName := range wallets {
-		err := addWallet(config, walletDirName, true, true)
+		err := addWallet(config, walletDirName, true)
 		if err != nil {
 			return err
 		}
@@ -309,7 +309,7 @@ func Add(config *Config, walletDirName string) error {
 			return fmt.Errorf("\"%s\" is not a wallet directory", getRelativeWalletDirectory(walletDirName))
 		}
 	}
-	err = addWallet(config, walletDirName, exists, false)
+	err = addWallet(config, walletDirName, false)
 	if err != nil {
 		return err
 	}
