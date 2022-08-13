@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,44 +12,6 @@ import (
 
 	"github.com/adrg/xdg"
 )
-
-// Logging
-
-func logMessage(prefix string, v ...interface{}) {
-	fmt.Fprintln(os.Stderr, prefix, fmt.Sprint(v...))
-}
-
-func logInfo(v ...interface{}) {
-	logMessage("Info:", v...)
-}
-
-func logError(v ...interface{}) {
-	logMessage("Error:", v...)
-}
-
-func logFatal(v ...interface{}) {
-	logError(v...)
-	os.Exit(1)
-}
-
-func logHelp(v ...interface{}) {
-	logError(v...)
-	Help()
-	os.Exit(1)
-}
-
-// Input
-
-var scanner = bufio.NewScanner(os.Stdin)
-
-func scanLine() string {
-	if !scanner.Scan() {
-		logFatal("failed to scan line")
-	}
-	return scanner.Text()
-}
-
-// Constants
 
 const walletsDirName = "TON Wallet"
 const currentWalletDirName = "data"
@@ -72,8 +33,6 @@ Commands:
   directory       Get %s directory path
   help            Print this help
 `
-
-// Program
 
 type Config struct {
 	configFilePath string
