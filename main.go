@@ -127,7 +127,11 @@ func addWallet(config *Config, walletDirName string, changeCurrentWallet bool) e
 
 	if walletName == currentWalletDirName {
 		for {
-			fmt.Printf("Enter name for the \"%s\" wallet (can't be \"%s\"; leave empty to keep the current): ", walletDirName, currentWalletDirName)
+			if walletDirName == currentWalletDirName {
+				fmt.Printf("Name the \"%s\" wallet (name can't be the current one): ", walletDirName)
+			} else {
+				fmt.Printf("Name the \"%s\" wallet (name can't be \"%s\"; leave empty to keep the current one): ", walletDirName, currentWalletDirName)
+			}
 			walletName = scanLine()
 			if walletName == "" {
 				walletName = walletDirName
